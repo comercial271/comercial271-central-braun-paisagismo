@@ -7,8 +7,10 @@ const navItems = [
   { id: 'diagnostico', label: 'Diagnóstico' },
   { id: 'plano', label: 'Plano de Ação' },
   { id: 'arsenal', label: 'Arsenal' },
+  { id: 'links', label: 'Links Rápidos' },
   { id: 'alvos', label: 'Alvos' },
-  { id: 'abordagem', label: 'Abordagem Comercial' },
+  { id: 'abordagem', label: 'Abordagem' },
+  { id: 'icp', label: 'ICP / Leads' },
   { id: 'prova-social', label: 'Prova Social' },
 ]
 
