@@ -10,6 +10,7 @@ const navItems = [
   { id: 'links', label: 'Links Rápidos' },
   { id: 'alvos', label: 'Alvos' },
   { id: 'abordagem', label: 'Abordagem' },
+  { id: 'instagram', label: 'Instagram' },
   { id: 'icp', label: 'ICP / Leads' },
   { id: 'prova-social', label: 'Prova Social' },
 ]

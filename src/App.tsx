@@ -7,9 +7,11 @@ import Arsenal from './components/Arsenal'
 import LinksRapidos from './components/LinksRapidos'
 import Alvos from './components/Alvos'
 import AbordagemComercial from './components/AbordagemComercial'
+import InstagramBraun from './components/InstagramBraun'
 import IcpBraun from './components/IcpBraun'
 import ProvaFocal from './components/ProvaFocal'
 import Footer from './components/Footer'
+import HelpButton from './components/HelpButton'
 
 export default function App() {
   return (
@@ -23,9 +25,11 @@ export default function App() {
       <LinksRapidos />
       <Alvos />
       <AbordagemComercial />
+      <InstagramBraun />
       <IcpBraun />
       <ProvaFocal />
       <Footer />
+      <HelpButton />
     </div>
   )
 }
