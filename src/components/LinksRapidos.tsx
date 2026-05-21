@@ -66,6 +66,58 @@ function EditableLink({ label, icon: Icon, value, onChange }: { label: string; i
   )
 }
 
+const MEMBROS_KEY = 'braun_area_membros_link_v1'
+
+function AreaMembrosBtn() {
+  const [url, setUrl] = useState(() => { try { return localStorage.getItem(MEMBROS_KEY) || '' } catch { return '' } })
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(url)
+
+  const commit = (val: string) => {
+    const v = val.trim()
+    setUrl(v)
+    setEditing(false)
+    try { localStorage.setItem(MEMBROS_KEY, v) } catch {}
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-1.5 bg-white/10 rounded-xl px-3 py-1.5">
+        <input
+          autoFocus
+          type="url"
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter') commit(draft); if (e.key === 'Escape') setEditing(false) }}
+          placeholder="https://members.greenn.com.br/..."
+          className="bg-transparent text-white placeholder-white/30 text-xs outline-none w-56"
+        />
+        <button onClick={() => commit(draft)} className="text-gold-400 hover:text-gold-300"><Check size={12} /></button>
+        <button onClick={() => setEditing(false)} className="text-white/40 hover:text-white/70"><X size={11} /></button>
+      </div>
+    )
+  }
+
+  if (url) {
+    return (
+      <div className="flex items-center gap-1">
+        <a href={url} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 bg-gold-500 hover:bg-gold-400 text-forest-900 text-xs font-bold px-4 py-2 rounded-xl transition-colors">
+          🎓 Área de Membros <ExternalLink size={11} />
+        </a>
+        <button onClick={() => { setDraft(url); setEditing(true) }} className="text-white/40 hover:text-white/70 p-1"><Edit3 size={11} /></button>
+      </div>
+    )
+  }
+
+  return (
+    <button onClick={() => { setDraft(''); setEditing(true) }}
+      className="inline-flex items-center gap-1.5 border border-dashed border-white/30 hover:border-gold-500 text-white/50 hover:text-gold-400 text-xs px-4 py-2 rounded-xl transition-colors">
+      <Edit3 size={11} /> Colar link da Área de Membros
+    </button>
+  )
+}
+
 const REVIEW_MSGS = [
   {
     id: 'formal',
@@ -150,6 +202,29 @@ export default function LinksRapidos() {
           <span className="text-forest-700 text-xs font-bold uppercase tracking-widest">Acesso direto</span>
           <h2 className="text-3xl font-bold text-forest-900 mt-1">Links Rápidos</h2>
           <p className="text-gray-500 mt-2">Tudo que você acessa com frequência — em um lugar só</p>
+        </div>
+
+        {/* ── Recursos Selva Premium ── */}
+        <div className="bg-forest-800 rounded-2xl p-5 mb-6 flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="bg-gold-500/20 p-2.5 rounded-xl shrink-0">
+              <Zap size={18} className="text-gold-500" />
+            </div>
+            <div>
+              <p className="font-bold text-white text-sm">Recursos Selva Premium</p>
+              <p className="text-white/50 text-xs">Cronograma de aulas e área de membros</p>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a
+              href="https://www.notion.so/COMUNIDADE-SELVA-Premium-35693140ded28010970af4105ed41660"
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors"
+            >
+              📅 Cronograma de Aulas (Notion) <ExternalLink size={11} />
+            </a>
+            <AreaMembrosBtn />
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
