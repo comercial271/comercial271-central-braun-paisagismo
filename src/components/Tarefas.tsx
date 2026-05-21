@@ -64,7 +64,7 @@ export default function Tarefas() {
           <div>
             <p className="font-bold text-lg">Semana decisiva — 22 a 30/05/2026</p>
             <p className="text-white/70 text-sm mt-1">Cinco movimentos que podem mudar definitivamente o seu faturamento. Não adie.</p>
-            <p className="mt-2 text-gold-500 text-sm font-semibold">0 / 5 concluídas — check-in em 03/06</p>
+            <p className="mt-2 text-gold-500 text-sm font-semibold">0 / 5 concluídas — check-in em 11/06</p>
           </div>
         </div>
 
@@ -106,7 +106,7 @@ export default function Tarefas() {
         <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-5 flex gap-3 items-start">
           <Calendar size={20} className="text-amber-600 shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-amber-900">Check-in com a Juliana: 03/06/2026</p>
+            <p className="font-bold text-amber-900">Check-in com a Juliana: 11/06/2026</p>
             <p className="text-amber-700 text-sm mt-0.5">Chegue com o resultado das 5 ações. O próximo passo depende do que você fizer esta semana.</p>
           </div>
         </div>

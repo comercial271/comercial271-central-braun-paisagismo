@@ -30,7 +30,7 @@ export default function Hero() {
           </p>
           <div className="mt-8 flex items-center gap-2">
             <Award size={16} className="text-gold-500" />
-            <span className="text-white/50 text-xs">Mentoria: Jean Francis | Sessão 1: 11/05/2026 | Check-in: 03/06/2026</span>
+            <span className="text-white/50 text-xs">Mentoria: Jean Francis | Sessão 1: 11/05/2026 | Check-in: 11/06/2026</span>
           </div>
         </div>
 

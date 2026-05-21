@@ -14,7 +14,7 @@ export default function Footer() {
         </div>
         <div className="text-center">
           <p className="text-white/60 text-sm">Central construída na Mentoria Selva Premium</p>
-          <p className="text-white/40 text-xs mt-1">Sessão 1: 11/05/2026 | Check-in: 03/06/2026</p>
+          <p className="text-white/40 text-xs mt-1">Sessão 1: 11/05/2026 | Check-in: 11/06/2026</p>
         </div>
         <div className="md:text-right">
           <p className="text-white/80 text-sm font-semibold">Mentoria: Jean Francis</p>

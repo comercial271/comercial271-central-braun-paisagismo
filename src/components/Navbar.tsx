@@ -8,6 +8,7 @@ const navItems = [
   { id: 'plano', label: 'Plano de Ação' },
   { id: 'arsenal', label: 'Arsenal' },
   { id: 'alvos', label: 'Alvos' },
+  { id: 'abordagem', label: 'Abordagem Comercial' },
   { id: 'prova-social', label: 'Prova Social' },
 ]
 

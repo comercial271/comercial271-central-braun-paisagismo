@@ -5,6 +5,7 @@ import Diagnostico from './components/Diagnostico'
 import PlanoAcao from './components/PlanoAcao'
 import Arsenal from './components/Arsenal'
 import Alvos from './components/Alvos'
+import AbordagemComercial from './components/AbordagemComercial'
 import ProvaFocal from './components/ProvaFocal'
 import Footer from './components/Footer'
 
@@ -18,6 +19,7 @@ export default function App() {
       <PlanoAcao />
       <Arsenal />
       <Alvos />
+      <AbordagemComercial />
       <ProvaFocal />
       <Footer />
     </div>
