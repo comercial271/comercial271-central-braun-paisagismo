@@ -66,57 +66,6 @@ function EditableLink({ label, icon: Icon, value, onChange }: { label: string; i
   )
 }
 
-const MEMBROS_KEY = 'braun_area_membros_link_v1'
-
-function AreaMembrosBtn() {
-  const [url, setUrl] = useState(() => { try { return localStorage.getItem(MEMBROS_KEY) || '' } catch { return '' } })
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(url)
-
-  const commit = (val: string) => {
-    const v = val.trim()
-    setUrl(v)
-    setEditing(false)
-    try { localStorage.setItem(MEMBROS_KEY, v) } catch {}
-  }
-
-  if (editing) {
-    return (
-      <div className="flex items-center gap-1.5 bg-white/10 rounded-xl px-3 py-1.5">
-        <input
-          autoFocus
-          type="url"
-          value={draft}
-          onChange={e => setDraft(e.target.value)}
-          onKeyDown={e => { if (e.key === 'Enter') commit(draft); if (e.key === 'Escape') setEditing(false) }}
-          placeholder="https://members.greenn.com.br/..."
-          className="bg-transparent text-white placeholder-white/30 text-xs outline-none w-56"
-        />
-        <button onClick={() => commit(draft)} className="text-gold-400 hover:text-gold-300"><Check size={12} /></button>
-        <button onClick={() => setEditing(false)} className="text-white/40 hover:text-white/70"><X size={11} /></button>
-      </div>
-    )
-  }
-
-  if (url) {
-    return (
-      <div className="flex items-center gap-1">
-        <a href={url} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 bg-gold-500 hover:bg-gold-400 text-forest-900 text-xs font-bold px-4 py-2 rounded-xl transition-colors">
-          🎓 Área de Membros <ExternalLink size={11} />
-        </a>
-        <button onClick={() => { setDraft(url); setEditing(true) }} className="text-white/40 hover:text-white/70 p-1"><Edit3 size={11} /></button>
-      </div>
-    )
-  }
-
-  return (
-    <button onClick={() => { setDraft(''); setEditing(true) }}
-      className="inline-flex items-center gap-1.5 border border-dashed border-white/30 hover:border-gold-500 text-white/50 hover:text-gold-400 text-xs px-4 py-2 rounded-xl transition-colors">
-      <Edit3 size={11} /> Colar link da Área de Membros
-    </button>
-  )
-}
 
 const REVIEW_MSGS = [
   {
@@ -223,7 +172,13 @@ export default function LinksRapidos() {
             >
               📅 Cronograma de Aulas (Notion) <ExternalLink size={11} />
             </a>
-            <AreaMembrosBtn />
+            <a
+              href="https://app.greenn.club/home"
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-gold-500 hover:bg-gold-400 text-forest-900 text-xs font-bold px-4 py-2 rounded-xl transition-colors"
+            >
+              🎓 Área de Membros <ExternalLink size={11} />
+            </a>
           </div>
         </div>
 
