@@ -1,3 +1,7 @@
+import { useState } from 'react'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
+import Login from './components/Login'
+import AdminView from './components/AdminView'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Tarefas from './components/Tarefas'
@@ -14,10 +18,29 @@ import MinhaJornada from './components/MinhaJornada'
 import Footer from './components/Footer'
 import HelpButton from './components/HelpButton'
 
-export default function App() {
+function AppContent() {
+  const { user, member, loading } = useAuth()
+  const [view, setView] = useState<'main' | 'admin'>('main')
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-forest-900 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gold-500/30 border-t-gold-500 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!user) return <Login />
+
+  if (view === 'admin' && member?.is_admin) {
+    return <AdminView onBack={() => setView('main')} />
+  }
+
   return (
     <div className="min-h-screen">
-      <Navbar />
+      <Navbar
+        onAdminClick={member?.is_admin ? () => setView('admin') : undefined}
+      />
       <Hero />
       <Tarefas />
       <Diagnostico />
@@ -33,5 +56,13 @@ export default function App() {
       <Footer />
       <HelpButton />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }

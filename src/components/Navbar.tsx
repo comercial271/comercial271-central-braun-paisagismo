@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Menu, X, Leaf } from 'lucide-react'
+import { Menu, X, Leaf, LogOut, Shield } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
 
 const navItems = [
   { id: 'inicio', label: 'Início' },
@@ -16,7 +17,8 @@ const navItems = [
   { id: 'jornada', label: 'Jornada' },
 ]
 
-export default function Navbar() {
+export default function Navbar({ onAdminClick }: { onAdminClick?: () => void }) {
+  const { member, signOut } = useAuth()
   const [active, setActive] = useState('inicio')
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -63,6 +65,21 @@ export default function Navbar() {
               {item.label}
             </button>
           ))}
+          {onAdminClick && (
+            <button
+              onClick={onAdminClick}
+              className="ml-1 px-3 py-1.5 rounded-lg text-sm font-medium text-gold-400 hover:text-gold-300 hover:bg-forest-700 transition-all flex items-center gap-1.5"
+            >
+              <Shield size={13} /> Admin
+            </button>
+          )}
+          <button
+            onClick={signOut}
+            title={`Sair (${member?.nome ?? ''})`}
+            className="ml-1 px-2 py-1.5 rounded-lg text-white/50 hover:text-white hover:bg-forest-700 transition-all"
+          >
+            <LogOut size={15} />
+          </button>
         </div>
         <button className="lg:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X size={24} /> : <Menu size={24} />}

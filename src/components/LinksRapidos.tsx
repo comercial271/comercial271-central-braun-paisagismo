@@ -1,15 +1,9 @@
 import { useState } from 'react'
+import { useMemberStorage } from '../hooks/useMemberStorage'
 import { ExternalLink, FolderOpen, Star, Zap, Edit3, Check, Home, Building, Briefcase, X, Copy, CheckCheck, MessageSquare, Link } from 'lucide-react'
 
 const MIDIAKIT_KEY = 'braun_midiakit_links_v1'
 const REVIEW_LINK_KEY = 'braun_review_link_v1'
-
-function loadReviewLink(): string {
-  try { return localStorage.getItem(REVIEW_LINK_KEY) || '' } catch { return '' }
-}
-function saveReviewLink(v: string) {
-  try { localStorage.setItem(REVIEW_LINK_KEY, v) } catch {}
-}
 
 interface MidiaKitLinks {
   residencial: string
@@ -17,12 +11,7 @@ interface MidiaKitLinks {
   empresas: string
 }
 
-function loadMidiaKit(): MidiaKitLinks {
-  try { return { residencial: '', condominios: '', empresas: '', ...JSON.parse(localStorage.getItem(MIDIAKIT_KEY) || '{}') } } catch { return { residencial: '', condominios: '', empresas: '' } }
-}
-function saveMidiaKit(m: MidiaKitLinks) {
-  try { localStorage.setItem(MIDIAKIT_KEY, JSON.stringify(m)) } catch {}
-}
+const DEFAULT_MIDIAKIT: MidiaKitLinks = { residencial: '', condominios: '', empresas: '' }
 
 function EditableLink({ label, icon: Icon, value, onChange }: { label: string; icon: React.ElementType; value: string; onChange: (v: string) => void }) {
   const [editing, setEditing] = useState(false)
@@ -144,15 +133,14 @@ function CopyButton({ text }: { text: string }) {
 }
 
 export default function LinksRapidos() {
-  const [midiaKit, setMidiaKit] = useState<MidiaKitLinks>(loadMidiaKit)
-  const [reviewLink, setReviewLink] = useState(loadReviewLink)
+  const [midiaKit, setMidiaKit] = useMemberStorage<MidiaKitLinks>(MIDIAKIT_KEY, DEFAULT_MIDIAKIT)
+  const [reviewLink, setReviewLink] = useMemberStorage<string>(REVIEW_LINK_KEY, '')
   const [editingReviewLink, setEditingReviewLink] = useState(false)
   const [reviewLinkDraft, setReviewLinkDraft] = useState('')
 
   const commitReviewLink = () => {
     const v = reviewLinkDraft.trim()
     setReviewLink(v)
-    saveReviewLink(v)
     setEditingReviewLink(false)
   }
 
@@ -164,9 +152,7 @@ export default function LinksRapidos() {
   }))
 
   const updateMidiaKit = (key: keyof MidiaKitLinks, value: string) => {
-    const next = { ...midiaKit, [key]: value }
-    setMidiaKit(next)
-    saveMidiaKit(next)
+    setMidiaKit({ ...midiaKit, [key]: value })
   }
 
   return (

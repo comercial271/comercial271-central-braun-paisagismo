@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
+import { useMemberStorage } from '../hooks/useMemberStorage'
 import { Circle, CheckCircle2, AlertTriangle, ExternalLink, Calendar, ChevronDown, ChevronUp, Paperclip, StickyNote, Trash2, FileText, Image, X } from 'lucide-react'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -22,22 +23,8 @@ interface TarefaState {
 
 const STORAGE_KEY = 'braun_tarefas_v1'
 
-function loadState(): Record<string, TarefaState> {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : {}
-  } catch {
-    return {}
-  }
-}
-
-function saveState(state: Record<string, TarefaState>) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-  } catch (e) {
-    console.warn('localStorage cheio — arquivos grandes não serão salvos')
-  }
-}
+type AllState = Record<string, TarefaState>
+type SetAllState = (v: AllState | ((p: AllState) => AllState)) => void
 
 // ─── Tarefa data ──────────────────────────────────────────────────────────────
 
@@ -142,23 +129,24 @@ function AnexoChip({ anexo, onRemove }: { anexo: Anexo; onRemove: () => void }) 
   )
 }
 
-function TarefaPanel({ tarefaId }: { tarefaId: string }) {
-  const [allState, setAllState] = useState<Record<string, TarefaState>>(loadState)
+function TarefaPanel({ tarefaId, allState, setAllState }: {
+  tarefaId: string
+  allState: AllState
+  setAllState: SetAllState
+}) {
   const state: TarefaState = allState[tarefaId] ?? { concluida: false, nota: '', anexos: [] }
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploadError, setUploadError] = useState('')
 
   const update = (patch: Partial<TarefaState>) => {
-    const next = { ...allState, [tarefaId]: { ...state, ...patch } }
-    setAllState(next)
-    saveState(next)
+    setAllState({ ...allState, [tarefaId]: { ...state, ...patch } })
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
     setUploadError('')
     files.forEach(file => {
-      const MAX = 3 * 1024 * 1024 // 3MB
+      const MAX = 3 * 1024 * 1024
       if (file.size > MAX) {
         setUploadError(`"${file.name}" é maior que 3MB. Suba no Google Drive e cole o link nas anotações.`)
         return
@@ -173,9 +161,10 @@ function TarefaPanel({ tarefaId }: { tarefaId: string }) {
           dataUrl: ev.target?.result as string,
           addedAt: new Date().toLocaleString('pt-BR'),
         }
-        const next = { ...allState, [tarefaId]: { ...state, anexos: [...state.anexos, newAnexo] } }
-        setAllState(next)
-        saveState(next)
+        setAllState(prev => ({
+          ...prev,
+          [tarefaId]: { ...state, anexos: [...state.anexos, newAnexo] }
+        }))
       }
       reader.readAsDataURL(file)
     })
@@ -244,16 +233,17 @@ function TarefaPanel({ tarefaId }: { tarefaId: string }) {
 
 // ─── Main card ────────────────────────────────────────────────────────────────
 
-function TarefaCard({ t }: { t: typeof tarefas[0] }) {
-  const [allState, setAllState] = useState<Record<string, TarefaState>>(loadState)
+function TarefaCard({ t, allState, setAllState }: {
+  t: typeof tarefas[0]
+  allState: AllState
+  setAllState: SetAllState
+}) {
   const [open, setOpen] = useState(false)
   const state: TarefaState = allState[t.id] ?? { concluida: false, nota: '', anexos: [] }
   const u = urgenciaConfig[t.urgencia]
 
   const toggleConcluida = () => {
-    const next = { ...allState, [t.id]: { ...state, concluida: !state.concluida } }
-    setAllState(next)
-    saveState(next)
+    setAllState({ ...allState, [t.id]: { ...state, concluida: !state.concluida } })
   }
 
   const hasActivity = state.nota.length > 0 || state.anexos.length > 0
@@ -310,7 +300,7 @@ function TarefaCard({ t }: { t: typeof tarefas[0] }) {
               {open ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
             </button>
           </div>
-          {open && <TarefaPanel tarefaId={t.id} />}
+          {open && <TarefaPanel tarefaId={t.id} allState={allState} setAllState={setAllState} />}
         </div>
       </div>
     </div>
@@ -320,14 +310,7 @@ function TarefaCard({ t }: { t: typeof tarefas[0] }) {
 // ─── Section ──────────────────────────────────────────────────────────────────
 
 export default function Tarefas() {
-  const [allState, setAllState] = useState<Record<string, TarefaState>>(loadState)
-
-  // Re-sync when storage changes (outro componente salvou)
-  useEffect(() => {
-    const sync = () => setAllState(loadState())
-    window.addEventListener('storage', sync)
-    return () => window.removeEventListener('storage', sync)
-  }, [])
+  const [allState, setAllState] = useMemberStorage<AllState>(STORAGE_KEY, {})
 
   const concluidas = tarefas.filter(t => allState[t.id]?.concluida).length
 
@@ -358,7 +341,7 @@ export default function Tarefas() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {tarefas.map(t => <TarefaCard key={t.id} t={t} />)}
+          {tarefas.map(t => <TarefaCard key={t.id} t={t} allState={allState} setAllState={setAllState} />)}
         </div>
 
         <div className="mt-8 bg-amber-50 border border-amber-200 rounded-xl p-5 flex gap-3 items-start">

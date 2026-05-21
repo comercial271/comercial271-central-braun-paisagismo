@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useMemberStorage } from '../hooks/useMemberStorage'
 import { TrendingUp, DollarSign, Award, Plus, Trash2, Check, X, ChevronRight, Zap, Star } from 'lucide-react'
 
 // ─── Storage ──────────────────────────────────────────────────────────────────
@@ -24,19 +25,9 @@ interface Contrato {
   data: string
 }
 
-function loadRevenue(): RevenueEntry[] {
-  try {
-    const saved = JSON.parse(localStorage.getItem(REVENUE_KEY) || '[]') as RevenueEntry[]
-    if (saved.length === 0) {
-      return [{ id: 'base', mes: 'mai/2026', faturamento: 15945, nota: 'Faturamento na entrada da Selva Premium', locked: true }]
-    }
-    return saved
-  } catch { return [{ id: 'base', mes: 'mai/2026', faturamento: 15945, nota: '', locked: true }] }
-}
-function saveRevenue(e: RevenueEntry[]) { try { localStorage.setItem(REVENUE_KEY, JSON.stringify(e)) } catch {} }
-
-function loadContratos(): Contrato[] { try { return JSON.parse(localStorage.getItem(CONTRACT_KEY) || '[]') } catch { return [] } }
-function saveContratos(c: Contrato[]) { try { localStorage.setItem(CONTRACT_KEY, JSON.stringify(c)) } catch {} }
+const DEFAULT_REVENUE: RevenueEntry[] = [
+  { id: 'base', mes: 'mai/2026', faturamento: 15945, nota: 'Faturamento na entrada da Selva Premium', locked: true }
+]
 
 // ─── Deliverables ─────────────────────────────────────────────────────────────
 
@@ -98,8 +89,8 @@ function RevenueChart({ entries }: { entries: RevenueEntry[] }) {
 // ─── Section ──────────────────────────────────────────────────────────────────
 
 export default function MinhaJornada() {
-  const [entries, setEntries]     = useState<RevenueEntry[]>(loadRevenue)
-  const [contratos, setContratos] = useState<Contrato[]>(loadContratos)
+  const [entries, setEntries]     = useMemberStorage<RevenueEntry[]>(REVENUE_KEY, DEFAULT_REVENUE)
+  const [contratos, setContratos] = useMemberStorage<Contrato[]>(CONTRACT_KEY, [])
 
   // new revenue form
   const [addingRev, setAddingRev]   = useState(false)
@@ -124,26 +115,26 @@ export default function MinhaJornada() {
     if (!revMes.trim() || !revFat.trim()) return
     const n: RevenueEntry = { id: String(Date.now()), mes: revMes.trim(), faturamento: parseFloat(revFat.replace(',', '.')), nota: revNota.trim() }
     const next = [...entries, n]
-    setEntries(next); saveRevenue(next)
+    setEntries(next)
     setRevMes(''); setRevFat(''); setRevNota(''); setAddingRev(false)
   }
 
   const removeRevenue = (id: string) => {
     const next = entries.filter(e => e.id !== id)
-    setEntries(next); saveRevenue(next)
+    setEntries(next)
   }
 
   const addContrato = () => {
     if (!cNome.trim() || !cValor.trim()) return
     const n: Contrato = { id: String(Date.now()), nome: cNome.trim(), valorMensal: parseFloat(cValor.replace(',', '.')), data: cData.trim() || new Date().toLocaleDateString('pt-BR') }
     const next = [n, ...contratos]
-    setContratos(next); saveContratos(next)
+    setContratos(next)
     setCNome(''); setCValor(''); setCData(''); setAddingCont(false)
   }
 
   const removeContrato = (id: string) => {
     const next = contratos.filter(c => c.id !== id)
-    setContratos(next); saveContratos(next)
+    setContratos(next)
   }
 
   return (

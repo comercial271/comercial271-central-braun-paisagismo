@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { useMemberStorage } from '../hooks/useMemberStorage'
 import { CheckCircle, XCircle, AlertCircle, Target, Trash2, Clock, ChevronDown, ChevronUp } from 'lucide-react'
 
 const ICP_LEADS_KEY    = 'braun_icp_leads_v1'
@@ -117,27 +118,21 @@ function scoreInfo(score: number, max: number) {
   return { label: 'ICP Vermelho — Não é o cliente certo', color: 'text-red-700', bg: 'bg-red-50 border-red-200', Icon: XCircle }
 }
 
-function loadLeads(): Lead[] { try { return JSON.parse(localStorage.getItem(ICP_LEADS_KEY) || '[]') } catch { return [] } }
-function saveLeads(l: Lead[]) { try { localStorage.setItem(ICP_LEADS_KEY, JSON.stringify(l)) } catch {} }
-function loadBuilder(): BuilderRespostas { try { return JSON.parse(localStorage.getItem(ICP_BUILDER_KEY) || '{}') } catch { return {} } }
-function saveBuilder(r: BuilderRespostas) { try { localStorage.setItem(ICP_BUILDER_KEY, JSON.stringify(r)) } catch {} }
 
 // ─── ICP Builder ─────────────────────────────────────────────────────────────
 
-function IcpBuilder() {
-  const [respostas, setRespostas] = useState<BuilderRespostas>(loadBuilder)
-  const [openCard, setOpenCard]   = useState<string | null>(builderQuestions[0].id)
+function IcpBuilder({ respostas, setRespostas }: {
+  respostas: BuilderRespostas
+  setRespostas: (v: BuilderRespostas | ((p: BuilderRespostas) => BuilderRespostas)) => void
+}) {
+  const [openCard, setOpenCard] = useState<string | null>(builderQuestions[0].id)
 
   const answeredCount = builderQuestions.filter(q => (respostas[q.id] || '').trim().length > 20).length
   const pct = Math.round((answeredCount / builderQuestions.length) * 100)
 
   const update = useCallback((id: string, val: string) => {
-    setRespostas(prev => {
-      const next = { ...prev, [id]: val }
-      saveBuilder(next)
-      return next
-    })
-  }, [])
+    setRespostas(prev => ({ ...prev, [id]: val }))
+  }, [setRespostas])
 
   return (
     <div>
@@ -205,7 +200,7 @@ function IcpBuilder() {
         <div className="mt-6 bg-forest-800 text-white rounded-2xl p-5">
           <p className="text-gold-500 text-xs font-bold uppercase tracking-widest mb-1">Seu ICP — construído por você</p>
           <p className="text-white/70 text-sm">Você respondeu as 8 perguntas. Use as suas respostas como filtro em toda prospecção: se o prospect não encaixar no que você descreveu, qualifique pelo score antes de avançar.</p>
-          <p className="text-white/50 text-xs mt-3">Todas as respostas ficam salvas neste dispositivo. No check-in de 11/06, traga este ICP revisado.</p>
+          <p className="text-white/50 text-xs mt-3">Respostas salvas na nuvem. No check-in de 11/06, traga este ICP revisado.</p>
         </div>
       )}
     </div>
@@ -214,7 +209,7 @@ function IcpBuilder() {
 
 // ─── Qualifier ────────────────────────────────────────────────────────────────
 
-function IcpQualifier({ onLeadSaved }: { onLeadSaved: () => void }) {
+function IcpQualifier({ onLeadSaved }: { onLeadSaved: (lead: Lead) => void }) {
   const [nome, setNome] = useState('')
   const [tipo, setTipo] = useState('')
   const [notas, setNotas] = useState('')
@@ -241,8 +236,7 @@ function IcpQualifier({ onLeadSaved }: { onLeadSaved: () => void }) {
       notas: notas.trim(),
       criadoEm: new Date().toLocaleDateString('pt-BR'),
     }
-    saveLeads([lead, ...loadLeads()])
-    onLeadSaved()
+    onLeadSaved(lead)
     setNome(''); setTipo(''); setNotas('')
     setRespostas(Object.fromEntries(perguntas.map(p => [p.id, null])))
     setDone(false)
@@ -318,18 +312,7 @@ function IcpQualifier({ onLeadSaved }: { onLeadSaved: () => void }) {
 
 // ─── Lead List ────────────────────────────────────────────────────────────────
 
-function LeadList({ refreshKey }: { refreshKey: number }) {
-  const [leads, setLeads] = useState<Lead[]>(loadLeads)
-  void refreshKey
-
-  const remove = (id: string) => {
-    const next = leads.filter(l => l.id !== id)
-    setLeads(next); saveLeads(next)
-  }
-
-  // sync when parent signals new lead saved
-  useState(() => { setLeads(loadLeads()) })
-
+function LeadList({ leads, onRemove }: { leads: Lead[]; onRemove: (id: string) => void }) {
   if (leads.length === 0) return (
     <div className="bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-10 text-center">
       <Target size={30} className="text-gray-200 mx-auto mb-3" />
@@ -356,7 +339,7 @@ function LeadList({ refreshKey }: { refreshKey: number }) {
                   {lead.notas && <p className="text-xs text-gray-600 mt-1.5 italic bg-white/60 px-2 py-1 rounded-lg">"{lead.notas}"</p>}
                 </div>
               </div>
-              <button onClick={() => remove(lead.id)} className="text-gray-300 hover:text-red-400 transition-colors shrink-0 p-0.5">
+              <button onClick={() => onRemove(lead.id)} className="text-gray-300 hover:text-red-400 transition-colors shrink-0 p-0.5">
                 <Trash2 size={14} />
               </button>
             </div>
@@ -370,7 +353,8 @@ function LeadList({ refreshKey }: { refreshKey: number }) {
 // ─── Section ──────────────────────────────────────────────────────────────────
 
 export default function IcpBraun() {
-  const [refreshKey, setRefreshKey] = useState(0)
+  const [leads, setLeads] = useMemberStorage<Lead[]>(ICP_LEADS_KEY, [])
+  const [builderRespostas, setBuilderRespostas] = useMemberStorage<BuilderRespostas>(ICP_BUILDER_KEY, {})
 
   return (
     <section id="icp" className="py-20 bg-white">
@@ -393,7 +377,7 @@ export default function IcpBraun() {
               Reserve 15 minutos, responda com honestidade — não existe resposta errada.
             </p>
           </div>
-          <IcpBuilder />
+          <IcpBuilder respostas={builderRespostas} setRespostas={setBuilderRespostas} />
         </div>
 
         {/* ── Reativação alert ── */}
@@ -415,11 +399,11 @@ export default function IcpBraun() {
           <p className="text-gray-500 text-sm mt-0.5">Com o ICP definido acima, use este score para avaliar cada novo prospect antes de montar a proposta.</p>
         </div>
         <div className="grid lg:grid-cols-2 gap-8 items-start">
-          <IcpQualifier onLeadSaved={() => setRefreshKey(k => k + 1)} />
+          <IcpQualifier onLeadSaved={(lead) => setLeads(prev => [lead, ...prev])} />
           <div>
             <p className="font-bold text-forest-900 mb-1">Prospects Avaliados</p>
             <p className="text-gray-500 text-sm mb-4">Histórico de qualificações — priorize o follow-up pelos verdes</p>
-            <LeadList refreshKey={refreshKey} />
+            <LeadList leads={leads} onRemove={(id) => setLeads(prev => prev.filter(l => l.id !== id))} />
           </div>
         </div>
       </div>
