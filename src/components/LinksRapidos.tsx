@@ -1,7 +1,15 @@
 import { useState } from 'react'
-import { ExternalLink, FolderOpen, Star, Zap, Edit3, Check, Home, Building, Briefcase, X, Copy, CheckCheck, MessageSquare } from 'lucide-react'
+import { ExternalLink, FolderOpen, Star, Zap, Edit3, Check, Home, Building, Briefcase, X, Copy, CheckCheck, MessageSquare, Link } from 'lucide-react'
 
 const MIDIAKIT_KEY = 'braun_midiakit_links_v1'
+const REVIEW_LINK_KEY = 'braun_review_link_v1'
+
+function loadReviewLink(): string {
+  try { return localStorage.getItem(REVIEW_LINK_KEY) || '' } catch { return '' }
+}
+function saveReviewLink(v: string) {
+  try { localStorage.setItem(REVIEW_LINK_KEY, v) } catch {}
+}
 
 interface MidiaKitLinks {
   residencial: string
@@ -137,6 +145,23 @@ function CopyButton({ text }: { text: string }) {
 
 export default function LinksRapidos() {
   const [midiaKit, setMidiaKit] = useState<MidiaKitLinks>(loadMidiaKit)
+  const [reviewLink, setReviewLink] = useState(loadReviewLink)
+  const [editingReviewLink, setEditingReviewLink] = useState(false)
+  const [reviewLinkDraft, setReviewLinkDraft] = useState('')
+
+  const commitReviewLink = () => {
+    const v = reviewLinkDraft.trim()
+    setReviewLink(v)
+    saveReviewLink(v)
+    setEditingReviewLink(false)
+  }
+
+  const resolvedMsgs = REVIEW_MSGS.map(msg => ({
+    ...msg,
+    text: reviewLink
+      ? msg.text.replace(/\[LINK DO GOOGLE MEU NEGÓCIO\]/g, reviewLink)
+      : msg.text,
+  }))
 
   const updateMidiaKit = (key: keyof MidiaKitLinks, value: string) => {
     const next = { ...midiaKit, [key]: value }
@@ -286,12 +311,49 @@ export default function LinksRapidos() {
             </div>
             <div>
               <p className="font-bold text-forest-900">Solicitar Avaliação no Google</p>
-              <p className="text-gray-500 text-sm">Copie a mensagem, substitua <span className="font-semibold text-forest-700">[NOME]</span> e <span className="font-semibold text-forest-700">[LINK DO GOOGLE MEU NEGÓCIO]</span>, e envie via WhatsApp</p>
+              <p className="text-gray-500 text-sm">Cole o link abaixo e ele entra automaticamente nas mensagens. Substitua só <span className="font-semibold text-forest-700">[NOME]</span> antes de enviar.</p>
             </div>
           </div>
 
+          {/* Link de avaliação editável */}
+          <div className="bg-[#F4F6F0] rounded-2xl p-4 mb-5 flex items-center gap-3">
+            <div className="bg-forest-800 p-2 rounded-xl shrink-0">
+              <Link size={14} className="text-gold-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-forest-900 mb-0.5">Link de Avaliação Google</p>
+              {editingReviewLink ? (
+                <div className="flex gap-1.5 items-center mt-1">
+                  <input
+                    autoFocus
+                    type="url"
+                    value={reviewLinkDraft}
+                    onChange={e => setReviewLinkDraft(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') commitReviewLink(); if (e.key === 'Escape') setEditingReviewLink(false) }}
+                    placeholder="https://g.page/r/..."
+                    className="flex-1 text-xs bg-white border border-forest-300 rounded-lg px-2 py-1.5 outline-none focus:border-forest-500 min-w-0"
+                  />
+                  <button onClick={commitReviewLink} className="text-green-600 hover:text-green-700 p-1"><Check size={13} /></button>
+                  <button onClick={() => setEditingReviewLink(false)} className="text-gray-400 hover:text-gray-600 p-1"><X size={11} /></button>
+                </div>
+              ) : (
+                <p className="text-xs text-gray-400 truncate">
+                  {reviewLink ? reviewLink : 'Nenhum link salvo — clique em Editar para colar o seu'}
+                </p>
+              )}
+            </div>
+            {!editingReviewLink && (
+              <button
+                onClick={() => { setReviewLinkDraft(reviewLink); setEditingReviewLink(true) }}
+                className="text-xs border border-gray-200 text-gray-400 hover:border-forest-300 hover:text-forest-600 px-3 py-1.5 rounded-lg transition-colors font-semibold shrink-0"
+              >
+                {reviewLink ? 'Editar' : '+ Colar link'}
+              </button>
+            )}
+          </div>
+
           <div className="grid md:grid-cols-2 gap-4">
-            {REVIEW_MSGS.map(msg => (
+            {resolvedMsgs.map(msg => (
               <div key={msg.id} className="bg-[#F4F6F0] rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-3 gap-2">
                   <div className="flex items-center gap-2 min-w-0">
@@ -305,10 +367,12 @@ export default function LinksRapidos() {
             ))}
           </div>
 
-          <div className="mt-3 flex items-start gap-2 text-xs text-gray-400">
-            <Star size={11} className="text-gold-500 shrink-0 mt-0.5" />
-            <p>O link do Google Meu Negócio está em <span className="font-semibold">Presença Digital → Google Meu Negócio</span> acima. Copie o link de avaliação direto no painel do Google Business.</p>
-          </div>
+          {!reviewLink && (
+            <div className="mt-3 flex items-start gap-2 text-xs text-gray-400">
+              <Star size={11} className="text-gold-500 shrink-0 mt-0.5" />
+              <p>Para obter o link: acesse <span className="font-semibold">business.google.com</span> → clique em "Receber mais avaliações" → copie o link curto.</p>
+            </div>
+          )}
         </div>
       </div>
     </section>
