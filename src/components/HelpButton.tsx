@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { HelpCircle, X, CheckSquare, FolderOpen, Link, Target, Instagram, Star, MessageSquare, Map, ChevronDown, ChevronUp } from 'lucide-react'
+import { HelpCircle, X, CheckSquare, FolderOpen, Link, Target, Instagram, Star, MessageSquare, Map, ChevronDown, ChevronUp, TrendingUp } from 'lucide-react'
 
 interface Section {
   id: string
@@ -84,6 +84,20 @@ const sections: Section[] = [
       'Para trocar uma foto: passe o mouse sobre ela e clique em "Trocar link".',
       'Depoimento: cole o texto do cliente (print de WhatsApp, avaliação Google, e-mail) no campo de depoimento. Adicione o nome e cargo no campo abaixo.',
       'Meta de Avaliações Google: clique no número atual (ex: "10") para editar. Atualize sempre que receber nova avaliação.',
+    ],
+  },
+  {
+    id: 'jornada',
+    icon: TrendingUp,
+    title: 'Jornada — Evolução e ROI',
+    navLabel: 'Jornada',
+    steps: [
+      'Barra de progresso: mostra quanto falta para a meta de R$50.000/mês. Atualiza automaticamente conforme você registra novos meses.',
+      'Evolução do Faturamento: clique em "Novo mês" para registrar o faturamento de cada mês. O gráfico de barras cresce com o tempo.',
+      'Contratos Fechados: cada contrato novo que você fechar durante o programa, registre aqui com nome do cliente e valor mensal.',
+      'ROI do Programa: assim que registrar contratos, o cálculo aparece automaticamente — quanto você gerou para cada R$1 investido na Selva.',
+      'O que você já recebeu: tabela com o valuation de mercado de cada entrega da mentoria — use para comparar o valor real recebido com o que pagou.',
+      'Dados ficam salvos no navegador. Atualize após cada novo contrato fechado ou fechamento de mês.',
     ],
   },
   {

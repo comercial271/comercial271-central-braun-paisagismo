@@ -13,6 +13,7 @@ const navItems = [
   { id: 'instagram', label: 'Instagram' },
   { id: 'icp', label: 'ICP / Leads' },
   { id: 'prova-social', label: 'Prova Social' },
+  { id: 'jornada', label: 'Jornada' },
 ]
 
 export default function Navbar() {

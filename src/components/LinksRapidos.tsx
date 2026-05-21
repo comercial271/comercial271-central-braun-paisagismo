@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ExternalLink, FolderOpen, Star, Zap, Edit3, Check, Home, Building, Briefcase, X } from 'lucide-react'
+import { ExternalLink, FolderOpen, Star, Zap, Edit3, Check, Home, Building, Briefcase, X, Copy, CheckCheck, MessageSquare } from 'lucide-react'
 
 const MIDIAKIT_KEY = 'braun_midiakit_links_v1'
 
@@ -63,6 +63,74 @@ function EditableLink({ label, icon: Icon, value, onChange }: { label: string; i
         </div>
       )}
     </div>
+  )
+}
+
+const REVIEW_MSGS = [
+  {
+    id: 'formal',
+    label: 'Para gestores B2B (condomínios, hotéis, empresas)',
+    tag: 'Formal',
+    tagColor: 'bg-forest-700 text-white',
+    text: `Bom dia, [NOME]! Tudo certo por aí?
+
+Passando para agradecer a confiança no nosso trabalho e perguntar se ficou satisfeito com o serviço da Braun Paisagismo.
+
+Se quiser nos ajudar a crescer, deixar uma avaliação no Google faz toda a diferença para que mais empresas sérias como a sua nos encontrem:
+
+👉 [LINK DO GOOGLE MEU NEGÓCIO]
+
+É rápido — menos de 2 minutos. Qualquer feedback é muito bem-vindo.
+
+Obrigado, Diego — Braun Paisagismo`,
+  },
+  {
+    id: 'informal',
+    label: 'Para clientes próximos (residencial, indicados)',
+    tag: 'Informal',
+    tagColor: 'bg-gold-500 text-forest-900',
+    text: `Oi [NOME]! Tudo bem?
+
+Espero que o jardim esteja ficando ainda mais bonito haha
+
+Te peço um favor rápido: se você ficou satisfeito com o trabalho, me ajuda com uma avaliação no Google? Leva só 1 minutinho e faz uma diferença enorme pra mim:
+
+⭐ [LINK DO GOOGLE MEU NEGÓCIO]
+
+Qualquer coisa que eu possa melhorar, pode falar também — fico grato!
+
+Abraço, Diego — Braun Paisagismo`,
+  },
+]
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  const copy = () => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }).catch(() => {
+      const el = document.createElement('textarea')
+      el.value = text
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+  return (
+    <button
+      onClick={copy}
+      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+        copied
+          ? 'bg-green-500 text-white'
+          : 'bg-forest-800 hover:bg-forest-700 text-white'
+      }`}
+    >
+      {copied ? <><CheckCheck size={12} /> Copiado!</> : <><Copy size={12} /> Copiar</>}
+    </button>
   )
 }
 
@@ -177,6 +245,39 @@ export default function LinksRapidos() {
                 </a>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* ── Solicitar Avaliação no Google ── */}
+        <div className="mt-8">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="bg-gold-100 p-2.5 rounded-xl shrink-0">
+              <MessageSquare size={18} className="text-gold-600" />
+            </div>
+            <div>
+              <p className="font-bold text-forest-900">Solicitar Avaliação no Google</p>
+              <p className="text-gray-500 text-sm">Copie a mensagem, substitua <span className="font-semibold text-forest-700">[NOME]</span> e <span className="font-semibold text-forest-700">[LINK DO GOOGLE MEU NEGÓCIO]</span>, e envie via WhatsApp</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {REVIEW_MSGS.map(msg => (
+              <div key={msg.id} className="bg-[#F4F6F0] rounded-2xl p-5">
+                <div className="flex items-center justify-between mb-3 gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${msg.tagColor}`}>{msg.tag}</span>
+                    <p className="text-xs text-gray-500 truncate">{msg.label}</p>
+                  </div>
+                  <CopyButton text={msg.text} />
+                </div>
+                <pre className="text-xs text-gray-700 whitespace-pre-wrap font-sans bg-white border border-gray-100 rounded-xl p-4 leading-relaxed max-h-64 overflow-y-auto">{msg.text}</pre>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-3 flex items-start gap-2 text-xs text-gray-400">
+            <Star size={11} className="text-gold-500 shrink-0 mt-0.5" />
+            <p>O link do Google Meu Negócio está em <span className="font-semibold">Presença Digital → Google Meu Negócio</span> acima. Copie o link de avaliação direto no painel do Google Business.</p>
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import AbordagemComercial from './components/AbordagemComercial'
 import InstagramBraun from './components/InstagramBraun'
 import IcpBraun from './components/IcpBraun'
 import ProvaFocal from './components/ProvaFocal'
+import MinhaJornada from './components/MinhaJornada'
 import Footer from './components/Footer'
 import HelpButton from './components/HelpButton'
 
@@ -28,6 +29,7 @@ export default function App() {
       <InstagramBraun />
       <IcpBraun />
       <ProvaFocal />
+      <MinhaJornada />
       <Footer />
       <HelpButton />
     </div>
