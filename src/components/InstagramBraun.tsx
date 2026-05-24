@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Clapperboard, Camera, BookOpen, Building2, Mic, CheckCircle, Circle, Flame, AlertCircle, TrendingUp } from 'lucide-react'
+import { Clapperboard, Camera, BookOpen, Building2, Mic, CheckCircle, Circle, Flame, AlertCircle, TrendingUp, Target, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react'
 
 const IG_IDEAS_KEY = 'braun_ig_ideas_v1'
 
@@ -96,6 +96,42 @@ const pilarLabel: Record<string, string> = {
   fundador:      'Fundador',
 }
 
+const reelsLancamento = [
+  {
+    num: '01',
+    pilar: 'Transformação + Prova Social',
+    gancho: 'Antes: ninguém tirava foto aqui. Depois: virou o cenário favorito dos hóspedes.',
+    conteudo: 'Antes/depois do melhor case disponível no portfólio — Hortencias Garden ou hotel similar. Mostrar o problema, o processo, o resultado.',
+    narracao: '"Esse espaço ficava esquecido nos bastidores do hotel. Ninguém parava aqui. A gente reorganizou a área, trocou o paisagismo, criou um ponto de convivência. Hoje aparece em avaliação de hóspede toda semana."',
+    cta: '"Hotel ou pousada na Serra? Me manda ORÇAMENTO no direct."',
+    tipo: 'transformacao',
+  },
+  {
+    num: '02',
+    pilar: 'Bastidor Premium',
+    gancho: 'O que acontece nas 2 horas antes de entregar um jardim de hotel. Bastidor real.',
+    conteudo: 'Vídeo do processo: equipe uniformizada chegando, preparando equipamento, trabalhando, varredura final, resultado entregue.',
+    narracao: '"A gente não chega e sai capinando. Tem protocolo. Cada visita começa com inspeção, termina com varredura completa. O cliente não precisa encontrar nada depois que a gente for embora."',
+    cta: '"Gestor? Síndico? Me chama com ORÇAMENTO — faço avaliação sem custo."',
+    tipo: 'bastidores',
+  },
+  {
+    num: '03',
+    pilar: 'Storytelling Pessoal',
+    gancho: 'Saí de uma fábrica de calçados. Virei contador. Me demitiram. Hoje cuido dos jardins dos hotéis de Gramado.',
+    conteudo: 'Diego falando diretamente para a câmera. Ambiente real: escritório, veículo ou obra. Tom direto, sem script ensaiado.',
+    narracao: '"Não comecei na jardinagem por vocação. Comecei porque precisava. Mas demorou pouco pra entender que cuidar de um espaço verde — de verdade, com responsabilidade — transforma o lugar onde as pessoas vivem e trabalham. Hoje a Braun atende hotéis, bancos, condomínios aqui na Serra. E a gente não fica satisfeito com menos do que o cliente ficar orgulhoso do espaço."',
+    cta: '"Se você tem um espaço que importa, vamos conversar."',
+    tipo: 'fundador',
+  },
+]
+
+const reelPilarBadge: Record<string, string> = {
+  transformacao: 'bg-forest-100 text-forest-800',
+  bastidores: 'bg-teal-100 text-teal-800',
+  fundador: 'bg-purple-100 text-purple-800',
+}
+
 function loadUsed(): Set<string> {
   try { return new Set(JSON.parse(localStorage.getItem(IG_IDEAS_KEY) || '[]')) } catch { return new Set() }
 }
@@ -109,6 +145,7 @@ export default function InstagramBraun() {
   const [used, setUsed] = useState<Set<string>>(loadUsed)
   const [activePilar, setActivePilar] = useState<string | null>(null)
   const [openPilar, setOpenPilar] = useState<string | null>(null)
+  const [openReel, setOpenReel] = useState<string | null>(null)
 
   const toggleUsed = (id: string) => {
     const next = new Set(used)
@@ -137,6 +174,77 @@ export default function InstagramBraun() {
             <p className="text-amber-800 text-sm mt-1">
               O gerente de hotel que vai te contratar pesquisa o <strong>@braun_paisagismo</strong> antes de responder o orçamento. Um perfil parado passa a mensagem errada. Seus concorrentes <strong>não fazem</strong> Instagram B2B — o espaço está aberto.
             </p>
+          </div>
+        </div>
+
+        {/* Filtro de Aprovação */}
+        <div className="bg-forest-900 rounded-2xl p-5 mb-6 flex gap-3 items-start border border-gold-500/30">
+          <Target size={20} className="text-gold-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-white text-sm mb-1">Filtro de aprovação — aplique em todo Reel antes de publicar</p>
+            <p className="text-white/70 text-sm italic">
+              "O gerente de um hotel 4 estrelas em Gramado vai ver isso e sentir que precisa me contratar?"
+            </p>
+            <p className="text-white/50 text-xs mt-1.5">Se a resposta for não, o Reel não existe. Postar para jardineiros atrai jardineiros — não clientes.</p>
+          </div>
+        </div>
+
+        {/* 3 Reels de Lançamento */}
+        <div className="mb-10">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="font-bold text-forest-900 text-lg">3 Reels para Executar Agora</h3>
+              <p className="text-gray-500 text-sm mt-0.5">Roteiro completo — gancho, narração, CTA. Grave nessa ordem.</p>
+            </div>
+            <a
+              href="https://docs.google.com/document/d/1wrm-alhUdgL5by-itk_Z9wIepQ9dRTME8H1VD3CXbCw"
+              target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-forest-700 border border-forest-200 hover:bg-forest-50 px-3 py-1.5 rounded-lg transition-colors shrink-0"
+            >
+              Estratégia completa <ExternalLink size={10} />
+            </a>
+          </div>
+          <div className="space-y-3">
+            {reelsLancamento.map(r => {
+              const isOpen = openReel === r.num
+              return (
+                <div key={r.num} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                  <button
+                    onClick={() => setOpenReel(prev => prev === r.num ? null : r.num)}
+                    className="w-full text-left p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="text-2xl font-black text-forest-200 leading-none w-8 shrink-0">{r.num}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap gap-1.5 mb-1">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${reelPilarBadge[r.tipo]}`}>{r.pilar}</span>
+                      </div>
+                      <p className="text-forest-900 font-semibold text-sm leading-snug truncate">"{r.gancho}"</p>
+                    </div>
+                    {isOpen ? <ChevronUp size={16} className="text-gray-400 shrink-0" /> : <ChevronDown size={16} className="text-gray-400 shrink-0" />}
+                  </button>
+                  {isOpen && (
+                    <div className="border-t border-gray-100 p-4 space-y-3 bg-gray-50/50">
+                      <div>
+                        <p className="text-xs font-bold text-forest-700 uppercase tracking-wider mb-1">Gancho (0–3s)</p>
+                        <p className="text-sm text-forest-900 font-semibold italic">"{r.gancho}"</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-forest-700 uppercase tracking-wider mb-1">Conteúdo visual</p>
+                        <p className="text-sm text-gray-600 leading-relaxed">{r.conteudo}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-forest-700 uppercase tracking-wider mb-1">Narração sugerida</p>
+                        <p className="text-sm text-gray-600 leading-relaxed italic">{r.narracao}</p>
+                      </div>
+                      <div className="bg-forest-800 rounded-xl p-3">
+                        <p className="text-xs font-bold text-gold-400 uppercase tracking-wider mb-1">CTA (25–30s)</p>
+                        <p className="text-sm text-white italic">{r.cta}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
 

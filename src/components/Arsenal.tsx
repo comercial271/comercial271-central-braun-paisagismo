@@ -1,6 +1,13 @@
-import { Zap, Home, Building, Briefcase, List, Star, FileText, FolderOpen, ExternalLink } from 'lucide-react'
+import { Zap, Home, Building, Briefcase, List, Star, FileText, FolderOpen, ExternalLink, Clapperboard } from 'lucide-react'
 
 const docs = [
+  {
+    icon: Clapperboard,
+    title: 'Estratégia de Reels — Braun Paisagismo',
+    desc: '5 pilares, 25 ganchos Kathy Bartz, 3 Reels de lançamento com roteiro completo. Objetivo: atrair hotéis, condomínios e empresas.',
+    link: { label: 'Abrir Estratégia', href: 'https://docs.google.com/document/d/1wrm-alhUdgL5by-itk_Z9wIepQ9dRTME8H1VD3CXbCw' },
+    highlight: true,
+  },
   {
     icon: Home,
     title: 'Portfólio Residencial',
@@ -68,16 +75,20 @@ export default function Arsenal() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
           {docs.map((d, i) => {
             const Icon = d.icon
+            const isHighlight = (d as any).highlight
             return (
-              <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 flex items-start gap-3">
-                <div className="bg-forest-100 p-2 rounded-xl shrink-0 mt-0.5">
-                  <Icon size={15} className="text-forest-700" />
+              <div key={i} className={`rounded-2xl p-4 border flex items-start gap-3 ${isHighlight ? 'bg-forest-50 border-forest-200 col-span-full lg:col-span-1' : 'bg-white border-gray-100'}`}>
+                <div className={`p-2 rounded-xl shrink-0 mt-0.5 ${isHighlight ? 'bg-forest-700' : 'bg-forest-100'}`}>
+                  <Icon size={15} className={isHighlight ? 'text-gold-400' : 'text-forest-700'} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-forest-900 text-sm leading-snug mb-0.5">{d.title}</h4>
+                  {isHighlight && (
+                    <span className="inline-block bg-gold-500 text-forest-900 text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded-full mb-1.5">Novo — Mai/2026</span>
+                  )}
+                  <h4 className={`font-bold text-sm leading-snug mb-0.5 ${isHighlight ? 'text-forest-900' : 'text-forest-900'}`}>{d.title}</h4>
                   <p className="text-gray-400 text-xs leading-relaxed mb-2">{d.desc}</p>
                   <a href={d.link.href} target="_blank" rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-forest-700 hover:text-forest-900 text-xs font-semibold transition-colors">
+                    className={`inline-flex items-center gap-1 text-xs font-semibold transition-colors ${isHighlight ? 'text-forest-700 hover:text-forest-900' : 'text-forest-700 hover:text-forest-900'}`}>
                     {d.link.label} <ExternalLink size={10} />
                   </a>
                 </div>
